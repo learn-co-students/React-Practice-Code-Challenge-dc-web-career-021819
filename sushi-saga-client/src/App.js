@@ -19,43 +19,26 @@ class App extends Component {
   getAllSushis(){
     fetch(URL).then(response => response.json())
     .then(sushis => {
-      this.setState({allSushis: sushis, sushisOnPlates: this.initializeSushis(sushis)})
+      this.setState({allSushis: sushis, sushisOnPlates: sushis.slice(0,4)})
     }
     )
   }
 
-  initializeSushis = (sushis) => {
-    let sushiSample = this.sample(sushis, 4)
-    sushiSample.forEach(sushi => sushi.eaten = false)
-    return sushiSample
-  }
-
-  randomSampleOfSushi = () =>{
-    let sushiSample = this.sample(this.state.allSushis, 4)
-    sushiSample.forEach(sushi => sushi.eaten = false)
-    return sushiSample
-  }
-
-  sample = (array, num) =>{
-    let sampleArray = []
-    for (let i = 0; i < num; i++){
-      let selection = array[Math.floor(array.length * Math.random())]
-      sampleArray.push(selection)
-    }
-    return sampleArray
-  }
-
   getMoreSushis = () =>{
+    let lastIndex = this.state.sushisOnPlates[3].id
     this.setState({
-      sushisOnPlates: this.randomSampleOfSushi()
+      sushisOnPlates: this.state.allSushis.slice(lastIndex,lastIndex+4)
     })
   }
 
   eatSushi = (sushi) => {
-    this.setState({
-      eatenSushis: [...this.state.eatenSushis, sushi.id],
-      balance: this.state.balance - sushi.price
-    })
+    let newBalance = this.state.balance - sushi.price
+    if (newBalance >= 0 && !this.state.eatenSushis.includes(sushi.id)) {
+      this.setState({
+        eatenSushis: [...this.state.eatenSushis, sushi.id],
+        balance: newBalance
+      })
+    }
   }
 
   componentDidMount(){
